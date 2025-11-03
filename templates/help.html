@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Documentation - Number Lookup Service</title>
-    <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Number Lookup Service</title>
+    <style>
 /* Base Styles */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -87,200 +87,200 @@ code.inline {
     padding-left: 15px;
     margin-bottom: 40px;
 }
-    </style>
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔍 Number Lookup API Documentation</h1>
-        <p>This API provides lookup services for numbers, with features including client-specific caching, security, and abuse prevention.</p>
+    <div class="container">
+        <h1>🔍 Number Lookup API Documentation</h1>
+        <p>This API provides lookup services for numbers, with features including client-specific caching, security, and abuse prevention.</p>
 
-        <p><strong>Base URL:</strong> <code class="inline">{{ base_url }}</code></p>
-        <p><strong>Example Client API Key:</strong> <code class="inline">{{ example_api_key }}</code></p>
-        
-        <div class="warning">
-            <strong>Security Note:</strong> All client endpoints require a valid API Key passed via the <code>X-API-Key</code> header or <code>?key</code> query parameter.
-        </div>
-        
-        <h2>🚦 API Usage & Rate Limiting</h2>
-        <div class="info">
-            <p>This API uses a **Global Sliding Window Rate Limit** to prevent abuse. All API keys share the same limit.</p>
-            <ul>
-                <li><strong>Current Limit:</strong> {{ rate_limit_count }} requests</li>
-                <li><strong>Window Size:</strong> {{ rate_limit_window }} seconds</li>
-            </ul>
-            <p>If you exceed the limit, the API will return a <code>429 Too Many Requests</code> status and include a <code>Retry-After</code> header indicating when you can make the next request.</p>
-        </div>
+        <p><strong>Base URL:</strong> <code class="inline">{{ base_url }}</code></p>
+        <p><strong>Example Client API Key:</strong> <code class="inline">{{ example_api_key }}</code></p>
+        
+        <div class="warning">
+            <strong>Security Note:</strong> All client endpoints require a valid API Key passed via the <code>X-API-Key</code> header or <code>?key</code> query parameter.
+        </div>
+        
+        <h2>🚦 API Usage & Rate Limiting</h2>
+        <div class="info">
+            <p>This API uses a **Global Sliding Window Rate Limit** to prevent abuse. All API keys share the same limit.</p>
+            <ul>
+                <li><strong>Current Limit:</strong> {{ rate_limit_count }} requests</li>
+                <li><strong>Window Size:</strong> {{ rate_limit_window }} seconds</li>
+            </ul>
+            <p>If you exceed the limit, the API will return a <code>429 Too Many Requests</code> status and include a <code>Retry-After</code> header indicating when you can make the next request.</p>
+        </div>
 
 
-        <h2>Standard Client Endpoints</h2>
-        
-        <div class="endpoint-group">
-            <h3>Lookup Single Number</h3>
-            <p>Retrieves information for a given number. The service prioritizes speed by first checking the client's dedicated in-memory **Cache** using the client's custom **Time-To-Live (TTL)**. If a cached result is available and valid, it is returned instantly. If not, the system attempts to fetch data sequentially from all configured external APIs. This ensures fresh data while minimizing external API calls.</p>
-            <p><span class="method get">GET</span> <span class="method post">POST</span> <code>/</code></p>
-            
-            <h4>Parameters (Can be Query, JSON Body, or Form Data)</h4>
-            <ul>
-                <li><code>number</code> (required): The number to look up.</li>
-                <li><code>key</code> (required): Your API access key. **(Recommended: use <code>X-API-Key</code> header)**</li>
-                <li><code>fields</code> (optional): Comma-separated list of fields to return from the result object (e.g., <code>name,city,status</code>).</li>
-            </ul>
+        <h2>Standard Client Endpoints</h2>
+        
+        <div class="endpoint-group">
+            <h3>Lookup Single Number</h3>
+            <p>Retrieves information for a given number. The service prioritizes speed by first checking the client's dedicated in-memory **Cache** using the client's custom **Time-To-Live (TTL)**. If a cached result is available and valid, it is returned instantly. If not, the system attempts to fetch data sequentially from all configured external APIs. This ensures fresh data while minimizing external API calls.</p>
+            <p><span class="method get">GET</span> <span class="method post">POST</span> <code>/</code></p>
+            
+            <h4>Parameters (Can be Query, JSON Body, or Form Data)</h4>
+            <ul>
+                <li><code>number</code> (required): The number to look up.</li>
+                <li><code>key</code> (required): Your API access key. **(Recommended: use <code>X-API-Key</code> header)**</li>
+                <li><code>fields</code> (optional): Comma-separated list of fields to return from the result object (e.g., <code>name,city,status</code>).</li>
+            </ul>
 
-            <h4>Example Request (cURL GET)</h4>
-            <pre>curl -X GET "{{ base_url }}/?number=1234567890&fields=status,name" \
-    -H "X-API-Key: {{ example_api_key }}"</pre>
+            <h4>Example Request (cURL GET)</h4>
+            <pre>curl -X GET "{{ base_url }}/?number=1234567890&fields=status,name" \
+    -H "X-API-Key: {{ example_api_key }}"</pre>
 
-            <h4>Example Response (Cache Hit)</h4>
-            <pre>{
-    "success": true,
-    "number": "1234567890",
-    "source": "cache", 
-    "cache_ttl_seconds": 86400,
-    "results": {
-        "status": "active",
-        "name": "John Doe"
-    },
-    "...api_info...": "..."
+            <h4>Example Response (Cache Hit)</h4>
+            <pre>{
+    "success": true,
+    "number": "1234567890",
+    "source": "cache", 
+    "cache_ttl_seconds": 86400,
+    "results": {
+        "status": "active",
+        "name": "John Doe"
+    },
+    "...api_info...": "..."
 }</pre>
-        </div>
-        
-        <div class="endpoint-group">
-            <h3>View Usage Statistics</h3>
-            <p>Retrieves the current usage statistics tied to the authenticated API key. This includes the total count of successful lookups, the number of cache hits, the key's custom **Time-To-Live (TTL)** setting, and details on the global rate limit configuration. This endpoint helps clients monitor their consumption.</p>
-            <p><span class="method get">GET</span> <code>/stats</code></p>
-            
-            <h4>Example Request (cURL)</h4>
-            <pre>curl -X GET "{{ base_url }}/stats" \
-    -H "X-API-Key: {{ example_api_key }}"</pre>
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>View Usage Statistics</h3>
+            <p>Retrieves the current usage statistics tied to the authenticated API key. This includes the total count of successful lookups, the number of cache hits, the key's custom **Time-To-Live (TTL)** setting, and details on the global rate limit configuration. This endpoint helps clients monitor their consumption.</p>
+            <p><span class="method get">GET</span> <code>/stats</code></p>
+            
+            <h4>Example Request (cURL)</h4>
+            <pre>curl -X GET "{{ base_url }}/stats" \
+    -H "X-API-Key: {{ example_api_key }}"</pre>
 
-            <h4>Example Response</h4>
-            <pre>{
-    "success": true,
-    "user_id": "UserA",
-    "usage_statistics": {
-        "success_count": 1500,
-        "cache_hit_count": 950
-    },
-    "cache_ttl_seconds": 86400,
-    "rate_limit_settings": "{{ rate_limit_count }} per {{ rate_limit_window }}s (Global)",
-    "...api_info...": "..."
+            <h4>Example Response</h4>
+            <pre>{
+    "success": true,
+    "user_id": "UserA",
+    "usage_statistics": {
+        "success_count": 1500,
+        "cache_hit_count": 950
+    },
+    "cache_ttl_seconds": 86400,
+    "rate_limit_settings": "{{ rate_limit_count }} per {{ rate_limit_window }}s (Global)",
+    "...api_info...": "..."
 }</pre>
-        </div>
+        </div>
 
-        <div class="endpoint-group">
-            <h3>Health Check</h3>
-            <p>A simple status check for monitoring the service's availability. It confirms that the Flask application is running and verifies that the persistent JSON configuration file (`api_data.json`) can be successfully accessed and loaded. **This endpoint does not require an API key or Admin key.**</p>
-            <p><span class="method get">GET</span> <code>/health</code></p>
-            <p><strong>*Requires no key.*</strong></p>
-        </div>
-        
+        <div class="endpoint-group">
+            <h3>Health Check</h3>
+            <p>A simple status check for monitoring the service's availability. It confirms that the Flask application is running and verifies that the persistent JSON configuration file (`api_data.json`) can be successfully accessed and loaded. **This endpoint does not require an API key or Admin key.**</p>
+            <p><span class="method get">GET</span> <code>/health</code></p>
+            <p><strong>*Requires no key.*</strong></p>
+        </div>
+        
 
-        <h2>👑 Administration Endpoints</h2>
-        <div class="warning">
-            All Admin Endpoints require the **Master Admin Key** to be set in the <code>X-Admin-Key</code> header (value: <code>{{ master_admin_key }}</code>).
-        </div>
-        
-        <div class="endpoint-group">
-            <h3>Add Client API Key</h3>
-            <p>Allows the administrator to provision a new client API key. The key must be unique, and parameters for the associated **user ID**, custom cache **Time-To-Live (TTL)** in seconds, and an optional **expiration date** can be set during creation. This key is immediately active for client use.</p>
-            <p><span class="method post">POST</span> <code>/admin/add_key</code></p>
-            
-            <h4>Parameters (Form Data or JSON)</h4>
-            <ul>
-                <li><code>key</code> (required): The new API key string.</li>
-                <li><code>user_id</code> (required): The user/client name.</li>
-                <li><code>ttl</code> (optional): Cache TTL in seconds (e.g., <code>3600</code> for 1 hour).</li>
-                <li><code>expires_at</code> (optional): ISO format expiration date (e.g., <code>2026-01-01T00:00:00Z</code>).</li>
-            </ul>
+        <h2>👑 Administration Endpoints</h2>
+        <div class="warning">
+            All Admin Endpoints require the **Master Admin Key** to be set in the <code>X-Admin-Key</code> header (value: <code>{{ master_admin_key }}</code>).
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>Add Client API Key</h3>
+            <p>Allows the administrator to provision a new client API key. The key must be unique, and parameters for the associated **user ID**, custom cache **Time-To-Live (TTL)** in seconds, and an optional **expiration date** can be set during creation. This key is immediately active for client use.</p>
+            <p><span class="method post">POST</span> <code>/admin/add_key</code></p>
+            
+            <h4>Parameters (Form Data or JSON)</h4>
+            <ul>
+                <li><code>key</code> (required): The new API key string.</li>
+                <li><code>user_id</code> (required): The user/client name.</li>
+                <li><code>ttl</code> (optional): Cache TTL in seconds (e.g., <code>3600</code> for 1 hour).</li>
+                <li><code>expires_at</code> (optional): ISO format expiration date (e.g., <code>2026-01-01T00:00:00Z</code>).</li>
+            </ul>
 
-            <h4>Example Request (Add Key with TTL and Expiration)</h4>
-            <pre>curl -X POST "{{ base_url }}/admin/add_key" \
-    -H "X-Admin-Key: {{ master_admin_key }}" \
-    -d "key=CLIENT_KEY_003&user_id=ClientC&ttl=7200&expires_at=2026-10-20T12:00:00Z"</pre>
-        </div>
+            <h4>Example Request (Add Key with TTL and Expiration)</h4>
+            <pre>curl -X POST "{{ base_url }}/admin/add_key" \
+    -H "X-Admin-Key: {{ master_admin_key }}" \
+    -d "key=CLIENT_KEY_003&user_id=ClientC&ttl=7200&expires_at=2026-10-20T12:00:00Z"</pre>
+        </div>
 
-        <div class="endpoint-group">
-            <h3>Delete Client API Key</h3>
-            <p>Removes an existing client API key from the system. This action is **permanent** and also deletes all associated usage statistics and configuration settings for that key. This is typically used to decommission a key or block a non-admin user.</p>
-            <p><span class="method post">POST</span> <code>/admin/delete_key</code></p>
-            
-            <h4>Parameters (Query, Form Data, or JSON)</h4>
-            <ul>
-                <li><code>key</code> (required): The API key string to be deleted.</li>
-            </ul>
-            
-            <h4>Example Request (Delete Key)</h4>
-            <pre>curl -X POST "{{ base_url }}/admin/delete_key?key=KEY_TO_REMOVE" \
-    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
-        </div>
-        
-        <div class="endpoint-group">
-            <h3>Manage IP Blocklist</h3>
-            <p>Manages the IP blocklist, providing an immediate block of specific IP addresses. A **GET** request displays the current list of blocked IPs. A **POST** request with an `ip` and `action` (`add` or `remove`) will immediately block or unblock the specified IP address from making any requests to the API.</p>
-            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ip_blocklist</code></p>
-            
-            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
-            <ul>
-                <li><code>ip</code> (required for POST): The IP address to manage.</li>
-                <li><code>action</code> (required for POST): Either <code>add</code> or <code>remove</code>.</li>
-            </ul>
+        <div class="endpoint-group">
+            <h3>Delete Client API Key</h3>
+            <p>Removes an existing client API key from the system. This action is **permanent** and also deletes all associated usage statistics and configuration settings for that key. This is typically used to decommission a key or block a non-admin user.</p>
+            <p><span class="method post">POST</span> <code>/admin/delete_key</code></p>
+            
+            <h4>Parameters (Query, Form Data, or JSON)</h4>
+            <ul>
+                <li><code>key</code> (required): The API key string to be deleted.</li>
+            </ul>
+            
+            <h4>Example Request (Delete Key)</h4>
+            <pre>curl -X POST "{{ base_url }}/admin/delete_key?key=KEY_TO_REMOVE" \
+    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>Manage IP Blocklist</h3>
+            <p>Manages the IP blocklist, providing an immediate block of specific IP addresses. A **GET** request displays the current list of blocked IPs. A **POST** request with an `ip` and `action` (`add` or `remove`) will immediately block or unblock the specified IP address from making any requests to the API.</p>
+            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ip_blocklist</code></p>
+            
+            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
+            <ul>
+                <li><code>ip</code> (required for POST): The IP address to manage.</li>
+                <li><code>action</code> (required for POST): Either <code>add</code> or <code>remove</code>.</li>
+            </ul>
 
-            <h4>Example Request (Add IP)</h4>
-            <pre>curl -X POST "{{ base_url }}/admin/ip_blocklist?ip=192.0.2.1&action=add" \
-    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
-        </div>
-        
-        <div class="endpoint-group">
-            <h3>Manage User-Agent Blocklist</h3>
-            <p>Manages the User-Agent blocklist for mitigating abuse from specific client software (e.g., bot crawlers). A **GET** request displays the current list of blocked User-Agent strings. A **POST** request with a `ua` string and `action` (`add` or `remove`) will block or unblock requests originating from clients using that specific User-Agent header.</p>
-            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ua_blocklist</code></p>
-            
-            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
-            <ul>
-                <li><code>ua</code> (required for POST): The User-Agent string to manage.</li>
-                <li><code>action</code> (required for POST): Either <code>add</code> or <code>remove</code>.</li>
-            </ul>
+            <h4>Example Request (Add IP)</h4>
+            <pre>curl -X POST "{{ base_url }}/admin/ip_blocklist?ip=192.0.2.1&action=add" \
+    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>Manage User-Agent Blocklist</h3>
+            <p>Manages the User-Agent blocklist for mitigating abuse from specific client software (e.g., bot crawlers). A **GET** request displays the current list of blocked User-Agent strings. A **POST** request with a `ua` string and `action` (`add` or `remove`) will block or unblock requests originating from clients using that specific User-Agent header.</p>
+            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ua_blocklist</code></p>
+            
+            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
+            <ul>
+                <li><code>ua</code> (required for POST): The User-Agent string to manage.</li>
+                <li><code>action</code> (required for POST): Action to perform, either <code>add</code> or <code>remove</code>.</li>
+            </ul>
 
-            <h4>Example Request (Remove User-Agent)</h4>
-            <pre>curl -X POST "{{ base_url }}/admin/ua_blocklist?ua=Python%2Frequests&action=remove" \
-    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
-        </div>
-        
-        <div class="endpoint-group">
-            <h3>Manage Global Configuration</h3>
-            <p>Provides control over the core, global settings of the API. A **GET** request displays the current global configuration. A **POST** request allows the administrator to update parameters such as the overall **rate limit count**, **rate limit window**, and the **default cache expiry seconds** for all new keys.</p>
-            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/config</code></p>
-            
-            <h4>Updatable Fields (POST JSON/Form)</h4>
-            <ul>
-                <li><code>rate_limit_count</code> (int)</li>
-                <li><code>rate_limit_window</code> (int)</li>
-                <li><code>default_cache_expiry_seconds</code> (int)</li>
-            </ul>
+            <h4>Example Request (Remove User-Agent)</h4>
+            <pre>curl -X POST "{{ base_url }}/admin/ua_blocklist?ua=Python%2Frequests&action=remove" \
+    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>Manage Global Configuration</h3>
+            <p>Provides control over the core, global settings of the API. A **GET** request displays the current global configuration. A **POST** request allows the administrator to update parameters such as the overall **rate limit count**, **rate limit window**, and the **default cache expiry seconds** for all new keys.</p>
+            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/config</code></p>
+            
+            <h4>Updatable Fields (POST JSON/Form)</h4>
+            <ul>
+                <li><code>rate_limit_count</code> (int)</li>
+                <li><code>rate_limit_window</code> (int)</li>
+                <li><code>default_cache_expiry_seconds</code> (int)</li>
+            </ul>
 
-            <h4>Example Request (Update Rate Limit via POST JSON)</h4>
-            <pre>curl -X POST "{{ base_url }}/admin/config" \
-    -H "X-Admin-Key: {{ master_admin_key }}" \
-    -H "Content-Type: application/json" \
-    -d '{"rate_limit_count": 20, "rate_limit_window": 30}'</pre>
-        </div>
+            <h4>Example Request (Update Rate Limit via POST JSON)</h4>
+            <pre>curl -X POST "{{ base_url }}/admin/config" \
+    -H "X-Admin-Key: {{ master_admin_key }}" \
+    -H "Content-Type: application/json" \
+    -d '{"rate_limit_count": 20, "rate_limit_window": 30}'</pre>
+        </div>
 
-        <div class="endpoint-group">
-            <h3>Manage CORS Origins</h3>
-            <p>Manages the set of allowed origins for **Cross-Origin Resource Sharing (CORS)**. A **GET** request shows the currently allowed origins. A **POST** request allows the administrator to **add** or **remove** specific domain origins to control which external websites can successfully make browser-based requests to the API.</p>
-            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/cors_origins</code></p>
-            
-            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
-            <ul>
-                <li><code>origin</code> (required for POST): The URL origin (e.g., <code>https://my-frontend-app.com</code>) to manage.</li>
-                <li><code>action</code> (required for POST): Action to perform, either <code>add</code> or <code>remove</code>.</li>
-            </ul>
-            
-            <h4>Example Request (Add Origin)</h4>
-            <pre>curl -X POST "{{ base_url }}/admin/cors_origins?origin=https://my-frontend-app.com&action=add" \
-    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
-        </div>
+        <div class="endpoint-group">
+            <h3>Manage CORS Origins</h3>
+            <p>Manages the set of allowed origins for **Cross-Origin Resource Sharing (CORS)**. A **GET** request shows the currently allowed origins. A **POST** request allows the administrator to **add** or **remove** specific domain origins to control which external websites can successfully make browser-based requests to the API.</p>
+            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/cors_origins</code></p>
+            
+            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
+            <ul>
+                <li><code>origin</code> (required for POST): The URL origin (e.g., <code>https://my-frontend-app.com</code>) to manage.</li>
+                <li><code>action</code> (required for POST): Action to perform, either <code>add</code> or <code>remove</code>.</li>
+            </ul>
+            
+            <h4>Example Request (Add Origin)</h4>
+            <pre>curl -X POST "{{ base_url }}/admin/cors_origins?origin=https://my-frontend-app.com&action=add" \
+    -H "X-Admin-Key: {{ master_admin_key }}"</pre>
+        </div>
 
-    </div>
+    </div>
 </body>
 </html>
