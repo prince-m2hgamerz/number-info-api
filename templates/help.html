@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Number Lookup Service</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1a73e8;
+            border-bottom: 3px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #4285f4;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #34a853;
+            margin-top: 20px;
+        }
+        code, pre {
+            background-color: #e6eefc;
+            border: 1px solid #c8dafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            display: block;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        code.inline {
+            display: inline;
+            padding: 2px 5px;
+            font-size: 0.9em;
+        }
+        .method {
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+            margin-right: 10px;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+        .get { background-color: #34a853; }
+        .post { background-color: #fbbc04; }
+        .warning {
+            padding: 15px;
+            background-color: #fce8e6;
+            border-left: 5px solid #ea4335;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .info {
+            padding: 15px;
+            background-color: #e6f7ff;
+            border-left: 5px solid #4285f4;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .endpoint-group {
+            border-left: 4px solid #fbbc04;
+            padding-left: 15px;
+            margin-bottom: 40px;
+        }
+        .tier-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .tier-table th, .tier-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .tier-table th {
+            background-color: #e6eefc;
+            color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Number Lookup API Documentation</h1>
+        <p>This API provides lookup services for numbers, with features including client-specific caching, tiered security, and abuse prevention.</p>
+
+        <p><strong>Base URL:</strong> <code class="inline">{{ base_url }}</code></p>
+        <p><strong>Example Client API Key:</strong> <code class="inline">{{ example_key }}</code></p>
+        
+        <div class="warning">
+            <strong>Security Note:</strong> All client endpoints require a valid API Key passed via the <code>X-API-Key</code> header or <code>?key</code> query parameter.
+        </div>
+        
+        <div class="info">
+            <strong>Tiered Usage:</strong> Usage is tracked by a **Daily Quota** (resets at midnight UTC) and a sliding-window **Rate Limit**. Check your tier limits below.
+        </div>
+        
+        <h2>💰 Subscription Tiers</h2>
+        <table class="tier-table">
+            <thead>
+                <tr>
+                    <th>Tier ID</th>
+                    <th>Daily Quota (Requests/Day)</th>
+                    <th>Sliding Rate Limit (Requests/Minute)</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for tier_id, limits in tiers.items() %}
+                <tr>
+                    <td><strong>{{ tier_id }}</strong></td>
+                    <td>{{ "{:,.0f}".format(limits.daily_limit) }}</td>
+                    <td>{{ limits.rate_limit_count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+        <h2>Standard Client Endpoints</h2>
+        
+        <div class="endpoint-group">
+            <h3>Lookup Single Number</h3>
+            <p>Retrieves information for a given number, utilizing the client's custom cache TTL and daily/rate limits.</p>
+            <p><span class="method get">GET</span> <span class="method post">POST</span> <code>/</code></p>
+            
+            <h4>Parameters</h4>
+            <ul>
+                <li><code>number</code> (required): The number to look up.</li>
+                <li><code>key</code> (required): Your API access key.</li>
+                <li><code>fields</code> (optional): Comma-separated list of fields to return (e.g., <code>name,city,status</code>).</li>
+            </ul>
+
+            <h4>Example Request (GET)</h4>
+            <pre>{{ base_url }}/?number=1234567890&key={{ example_key }}&fields=status,name</pre>
+
+            <h4>Example Response (Success)</h4>
+            <pre>{
+    "success": true,
+    "number": "1234567890",
+    "source": "cache", 
+    "cache_ttl_seconds": 3600,
+    "results": {
+        "status": "active",
+        "name": "John Doe"
+    }
+}</pre>
+        </div>
+
+        <div class="endpoint-group">
+            <h3>⚡ Bulk Lookup</h3>
+            <p>Processes a list of numbers in a single request. Each number counts as **one** hit against your rate limit.</p>
+            <p><span class="method post">POST</span> <code>/bulk_lookup</code></p>
+            
+            <h4>Parameters</h4>
+            <ul>
+                <li><code>numbers</code> (required): JSON array of numbers to look up (Max 50 items).</li>
+                <li><code>key</code> (required): Your API access key (in query or header).</li>
+            </ul>
+
+            <h4>Example Request (POST JSON Body)</h4>
+            <pre>{
+    "numbers": ["1234567890", "9876543210"],
+    "key": "{{ example_key }}" 
+}</pre>
+            
+            <h4>Example Response (Mixed Results)</h4>
+            <pre>{
+    "success": true,
+    "total_requested": 2,
+    "results": [
+        {
+            "number": "1234567890",
+            "status": "success",
+            "source": "external_api",
+            "results": {"status": "active"}
+        },
+        {
+            "number": "0000000000",
+            "status": "failure",
+            "error": "Number not found or invalid format"
+        }
+    ]
+}</pre>
+        </div>
+
+        <div class="endpoint-group">
+            <h3>View Usage Statistics</h3>
+            <p>View your API usage counts, including daily quota remaining and tier details.</p>
+            <p><span class="method get">GET</span> <code>/stats</code></p>
+            
+            <h4>Example Request</h4>
+            <pre>{{ base_url }}/stats?key={{ example_key }}</pre>
+        </div>
+
+        <div class="endpoint-group">
+            <h3>Health Check</h3>
+            <p>Checks the API's current status and database connection health.</p>
+            <p><span class="method get">GET</span> <code>/health</code></p>
+            <p><strong>*Requires no key.*</strong></p>
+        </div>
+        
+
+        <h2>👑 Administration Endpoints</h2>
+        <div class="warning">
+            All Admin Endpoints require the <code>X-Admin-Key</code> header to be set to the **Master Admin Key** (<code>{{ admin_key }}</code>).
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>Manage Keys (Create/Delete)</h3>
+            <p>Create client API keys and assign them a specific tier and cache TTL.</p>
+            <p><span class="method post">POST</span> <code>/admin/add_key</code></p>
+            
+            <h4>Parameters</h4>
+            <ul>
+                <li><code>key</code> (required): The new API key string.</li>
+                <li><code>user_id</code> (required): The user/client name.</li>
+                <li><code>tier_id</code> (required): The subscription level (e.g., <code>basic</code>, <code>pro</code>).</li>
+                <li><code>ttl</code> (optional): Cache TTL in seconds.</li>
+            </ul>
+
+            <h4>Example Request (Add)</h4>
+            <pre>{{ base_url }}/admin/add_key?key=NEW_KEY&user_id=ClientZ&tier_id=basic&ttl=3600</pre>
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>🔒 Manage IP Overrides</h3>
+            <p>Set a custom rate limit and cache TTL for a specific IP address, overriding the client's tier.</p>
+            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ip_override</code></p>
+            
+            <h4>Example Request (Add Override)</h4>
+            <pre>{{ base_url }}/admin/ip_override?action=add&ip=192.0.2.1&rate_limit=50&ttl=7200</pre>
+        </div>
+        
+        <div class="endpoint-group">
+            <h3>Manage Global Configuration / Tiers</h3>
+            <p>View and update global settings and subscription tier definitions.</p>
+            <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/config</code> | <code>/admin/tiers</code></p>
+            
+            <h4>Example Request (Update Tiers via POST JSON)</h4>
+            <pre class="post-body">POST to /admin/tiers
+{
+    "basic": {"daily_limit": 1500, "rate_limit_count": 10},
+    "new_tier": {"daily_limit": 50000, "rate_limit_count": 200}
+}</pre>
+        </div>
+
+    </div>
+</body>
+</html>
