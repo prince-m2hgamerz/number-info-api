@@ -1,0 +1,5 @@
+Flask
+gunicorn
+requests
+python-dateutil
+# Add any other libraries you use (e.g., redis, psycopg2, etc.)
