@@ -5,82 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Documentation - Number Lookup Service</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 40px;
-            background-color: #f4f6f9;
-            color: #333;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #1a73e8;
-            border-bottom: 3px solid #e0e0e0;
-            padding-bottom: 15px;
-            margin-top: 0;
-        }
-        h2 {
-            color: #4285f4;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 8px;
-            margin-top: 30px;
-        }
-        h3 {
-            color: #34a853;
-            margin-top: 20px;
-        }
-        code, pre {
-            background-color: #e6eefc;
-            border: 1px solid #c8dafc;
-            padding: 8px 12px;
-            border-radius: 6px;
-            overflow-x: auto;
-            display: block;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-        code.inline {
-            display: inline;
-            padding: 2px 5px;
-            font-size: 0.9em;
-        }
-        .method {
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: white;
-            margin-right: 10px;
-            text-transform: uppercase;
-            font-size: 0.85em;
-        }
-        .get { background-color: #34a853; }
-        .post { background-color: #fbbc04; }
-        .warning {
-            padding: 15px;
-            background-color: #fce8e6;
-            border-left: 5px solid #ea4335;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-        .info {
-            padding: 15px;
-            background-color: #e6f7ff;
-            border-left: 5px solid #4285f4;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-        .endpoint-group {
-            border-left: 4px solid #fbbc04;
-            padding-left: 15px;
-            margin-bottom: 40px;
-        }
+/* Base Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 40px;
+    background-color: #f4f6f9;
+    color: #333;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    color: #1a73e8;
+    border-bottom: 3px solid #e0e0e0;
+    padding-bottom: 15px;
+    margin-top: 0;
+}
+h2 {
+    color: #4285f4;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 8px;
+    margin-top: 30px;
+}
+h3 {
+    color: #34a853;
+    margin-top: 20px;
+}
+/* Code Blocks */
+code, pre {
+    background-color: #e6eefc;
+    border: 1px solid #c8dafc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    display: block;
+    margin: 10px 0;
+    font-size: 14px;
+}
+code.inline {
+    display: inline;
+    padding: 2px 5px;
+    font-size: 0.9em;
+}
+/* Method Tags */
+.method {
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: white;
+    margin-right: 10px;
+    text-transform: uppercase;
+    font-size: 0.85em;
+}
+.get { background-color: #34a853; }
+.post { background-color: #fbbc04; }
+
+/* Alert Boxes */
+.warning {
+    padding: 15px;
+    background-color: #fce8e6;
+    border-left: 5px solid #ea4335;
+    margin: 20px 0;
+    border-radius: 6px;
+}
+.info {
+    padding: 15px;
+    background-color: #e6f7ff;
+    border-left: 5px solid #4285f4;
+    margin: 20px 0;
+    border-radius: 6px;
+}
+/* Endpoint Group Divider */
+.endpoint-group {
+    border-left: 4px solid #fbbc04;
+    padding-left: 15px;
+    margin-bottom: 40px;
+}
     </style>
 </head>
 <body>
@@ -110,7 +116,7 @@
         
         <div class="endpoint-group">
             <h3>Lookup Single Number</h3>
-            <p>Retrieves information for a given number. It first checks the in-memory **Cache** using the client's custom **Time-To-Live (TTL)**. If not cached, it attempts to fetch data sequentially from all configured external APIs.</p>
+            <p>Retrieves information for a given number. The service prioritizes speed by first checking the client's dedicated in-memory **Cache** using the client's custom **Time-To-Live (TTL)**. If a cached result is available and valid, it is returned instantly. If not, the system attempts to fetch data sequentially from all configured external APIs. This ensures fresh data while minimizing external API calls.</p>
             <p><span class="method get">GET</span> <span class="method post">POST</span> <code>/</code></p>
             
             <h4>Parameters (Can be Query, JSON Body, or Form Data)</h4>
@@ -140,7 +146,7 @@
         
         <div class="endpoint-group">
             <h3>View Usage Statistics</h3>
-            <p>View your API usage counts, including total successful lookups and cache hits.</p>
+            <p>Retrieves the current usage statistics tied to the authenticated API key. This includes the total count of successful lookups, the number of cache hits, the key's custom **Time-To-Live (TTL)** setting, and details on the global rate limit configuration. This endpoint helps clients monitor their consumption.</p>
             <p><span class="method get">GET</span> <code>/stats</code></p>
             
             <h4>Example Request (cURL)</h4>
@@ -163,7 +169,7 @@
 
         <div class="endpoint-group">
             <h3>Health Check</h3>
-            <p>Checks the API's current operational status and the status of the persistent JSON 'database' file.</p>
+            <p>A simple status check for monitoring the service's availability. It confirms that the Flask application is running and verifies that the persistent JSON configuration file (`api_data.json`) can be successfully accessed and loaded. **This endpoint does not require an API key or Admin key.**</p>
             <p><span class="method get">GET</span> <code>/health</code></p>
             <p><strong>*Requires no key.*</strong></p>
         </div>
@@ -171,15 +177,15 @@
 
         <h2>👑 Administration Endpoints</h2>
         <div class="warning">
-            All Admin Endpoints require the <code>X-Admin-Key</code> header to be set to the **Master Admin Key** (<code>{{ master_admin_key }}</code>).
+            All Admin Endpoints require the **Master Admin Key** to be set in the <code>X-Admin-Key</code> header (value: <code>{{ master_admin_key }}</code>).
         </div>
         
         <div class="endpoint-group">
             <h3>Add Client API Key</h3>
-            <p>Creates a new API key and sets its associated user, cache TTL, and optional expiration date.</p>
+            <p>Allows the administrator to provision a new client API key. The key must be unique, and parameters for the associated **user ID**, custom cache **Time-To-Live (TTL)** in seconds, and an optional **expiration date** can be set during creation. This key is immediately active for client use.</p>
             <p><span class="method post">POST</span> <code>/admin/add_key</code></p>
             
-            <h4>Parameters</h4>
+            <h4>Parameters (Form Data or JSON)</h4>
             <ul>
                 <li><code>key</code> (required): The new API key string.</li>
                 <li><code>user_id</code> (required): The user/client name.</li>
@@ -195,8 +201,13 @@
 
         <div class="endpoint-group">
             <h3>Delete Client API Key</h3>
-            <p>Deletes an API key and removes all its associated usage data and settings.</p>
+            <p>Removes an existing client API key from the system. This action is **permanent** and also deletes all associated usage statistics and configuration settings for that key. This is typically used to decommission a key or block a non-admin user.</p>
             <p><span class="method post">POST</span> <code>/admin/delete_key</code></p>
+            
+            <h4>Parameters (Query, Form Data, or JSON)</h4>
+            <ul>
+                <li><code>key</code> (required): The API key string to be deleted.</li>
+            </ul>
             
             <h4>Example Request (Delete Key)</h4>
             <pre>curl -X POST "{{ base_url }}/admin/delete_key?key=KEY_TO_REMOVE" \
@@ -205,10 +216,10 @@
         
         <div class="endpoint-group">
             <h3>Manage IP Blocklist</h3>
-            <p>Lists, adds, or removes IP addresses that are instantly blocked from accessing the API.</p>
+            <p>Manages the IP blocklist, providing an immediate block of specific IP addresses. A **GET** request displays the current list of blocked IPs. A **POST** request with an `ip` and `action` (`add` or `remove`) will immediately block or unblock the specified IP address from making any requests to the API.</p>
             <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ip_blocklist</code></p>
             
-            <h4>Parameters</h4>
+            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
             <ul>
                 <li><code>ip</code> (required for POST): The IP address to manage.</li>
                 <li><code>action</code> (required for POST): Either <code>add</code> or <code>remove</code>.</li>
@@ -221,10 +232,10 @@
         
         <div class="endpoint-group">
             <h3>Manage User-Agent Blocklist</h3>
-            <p>Lists, adds, or removes User-Agent strings that are instantly blocked from accessing the API.</p>
+            <p>Manages the User-Agent blocklist for mitigating abuse from specific client software (e.g., bot crawlers). A **GET** request displays the current list of blocked User-Agent strings. A **POST** request with a `ua` string and `action` (`add` or `remove`) will block or unblock requests originating from clients using that specific User-Agent header.</p>
             <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/ua_blocklist</code></p>
             
-            <h4>Parameters</h4>
+            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
             <ul>
                 <li><code>ua</code> (required for POST): The User-Agent string to manage.</li>
                 <li><code>action</code> (required for POST): Either <code>add</code> or <code>remove</code>.</li>
@@ -237,7 +248,7 @@
         
         <div class="endpoint-group">
             <h3>Manage Global Configuration</h3>
-            <p>View and update global parameters like the Rate Limit settings and the default Cache TTL.</p>
+            <p>Provides control over the core, global settings of the API. A **GET** request displays the current global configuration. A **POST** request allows the administrator to update parameters such as the overall **rate limit count**, **rate limit window**, and the **default cache expiry seconds** for all new keys.</p>
             <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/config</code></p>
             
             <h4>Updatable Fields (POST JSON/Form)</h4>
@@ -256,8 +267,14 @@
 
         <div class="endpoint-group">
             <h3>Manage CORS Origins</h3>
-            <p>View and update the set of allowed Cross-Origin Resource Sharing (CORS) origins for browser-based requests.</p>
+            <p>Manages the set of allowed origins for **Cross-Origin Resource Sharing (CORS)**. A **GET** request shows the currently allowed origins. A **POST** request allows the administrator to **add** or **remove** specific domain origins to control which external websites can successfully make browser-based requests to the API.</p>
             <p><span class="method get">GET</span> / <span class="method post">POST</span> <code>/admin/cors_origins</code></p>
+            
+            <h4>Parameters (Required for POST - Query, Form Data, or JSON)</h4>
+            <ul>
+                <li><code>origin</code> (required for POST): The URL origin (e.g., <code>https://my-frontend-app.com</code>) to manage.</li>
+                <li><code>action</code> (required for POST): Action to perform, either <code>add</code> or <code>remove</code>.</li>
+            </ul>
             
             <h4>Example Request (Add Origin)</h4>
             <pre>curl -X POST "{{ base_url }}/admin/cors_origins?origin=https://my-frontend-app.com&action=add" \
